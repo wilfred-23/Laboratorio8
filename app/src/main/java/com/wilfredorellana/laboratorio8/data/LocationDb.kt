@@ -2,17 +2,16 @@ package com.wilfredorellana.laboratorio8.data
 
 object LocationDb {
     private val locations = listOf(
-        Location(1, "Autobot City", "City", "Earth"),
-        Location(2, "Chicago", "City", "Earth"),
-        Location(3, "Machu Picchu", "Historic site", "Earth"),
-        Location(4, "Cybertron", "Planet", "Prime Universe"),
-        Location(5, "Mission City", "City", "Earth"),
-        Location(6, "Egypt", "Country", "Earth"),
-        Location(7, "Hong Kong", "City", "Earth"),
-        Location(8, "Hoover Dam", "Military base", "Earth"),
-        Location(9, "Moon Base One", "Lunar base", "Earth's Moon"),
-        Location(10, "The Nemesis", "Decepticon spaceship", "Deep space"),
-        Location(11, "Stonehenge, England", "Historic monument", "Earth")
+        Location(1, "Earth (C-137)", "Planet", "Dimension C-137"),
+        Location(2, "Abadango", "Cluster", "Unknown"),
+        Location(3, "Citadel of Ricks", "Space station", "Unknown"),
+        Location(4, "Worldender's lair", "Planet", "Unknown"),
+        Location(5, "Anatomy Park", "Microverse", "Dimension C-137"),
+        Location(6, "Interdimensional Cable", "TV", "Unknown"),
+        Location(7, "Immortality Field Resort", "Resort", "Unknown"),
+        Location(8, "Post-Apocalyptic Earth", "Planet", "Post-Apocalyptic Dimension"),
+        Location(9, "Purge Planet", "Planet", "Replacement Dimension"),
+        Location(10, "Venzenulon 7", "Planet", "Unknown")
     )
 
     fun getLocations(): List<Location> = locations
