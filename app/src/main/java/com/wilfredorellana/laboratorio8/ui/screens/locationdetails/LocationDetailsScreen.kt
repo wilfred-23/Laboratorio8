@@ -17,26 +17,21 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.wilfredorellana.laboratorio8.ui.screens.ErrorScreen
 import com.wilfredorellana.laboratorio8.ui.screens.LoadingScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LocationDetailsScreen(
-    locationId: Int,
     onBack: () -> Unit,
     viewModel: LocationDetailsViewModel = viewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-
-    LaunchedEffect(locationId) {
-        viewModel.load(locationId)
-    }
 
     Scaffold(
         topBar = {
@@ -57,15 +52,17 @@ fun LocationDetailsScreen(
 
         when {
             state.isLoading -> {
-                LoadingScreen(Modifier.padding(innerPadding))
+                LoadingScreen(
+                    onClick = viewModel::showError,
+                    modifier = Modifier.padding(innerPadding)
+                )
             }
 
             state.hasError || location == null -> {
-                Text(
-                    text = "No se encontró la ubicación",
-                    modifier = Modifier
-                        .padding(innerPadding)
-                        .padding(24.dp)
+                ErrorScreen(
+                    message = "Error al obtener la ubicación.",
+                    onRetry = viewModel::retry,
+                    modifier = Modifier.padding(innerPadding)
                 )
             }
 

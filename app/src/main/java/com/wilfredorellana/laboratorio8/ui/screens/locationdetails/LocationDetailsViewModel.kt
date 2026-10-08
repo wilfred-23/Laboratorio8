@@ -1,9 +1,12 @@
 package com.wilfredorellana.laboratorio8.ui.screens.locationdetails
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.wilfredorellana.laboratorio8.data.Location
 import com.wilfredorellana.laboratorio8.data.LocationDb
+import com.wilfredorellana.laboratorio8.navigation.LocationDetailsRoute
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -18,17 +21,30 @@ data class LocationDetailsUiState(
     val hasError: Boolean = false
 )
 
-class LocationDetailsViewModel : ViewModel() {
+class LocationDetailsViewModel(
+    savedStateHandle: SavedStateHandle
+) : ViewModel() {
+    private val locationId =
+        savedStateHandle.toRoute<LocationDetailsRoute>().locationId
+
     private val _uiState = MutableStateFlow(LocationDetailsUiState())
     val uiState: StateFlow<LocationDetailsUiState> = _uiState.asStateFlow()
 
-    private var requestedId: Int? = null
     private var loadJob: Job? = null
 
-    fun load(locationId: Int) {
-        if (requestedId == locationId) return
+    init {
+        retry()
+    }
 
-        requestedId = locationId
+    fun showError() {
+        loadJob?.cancel()
+        _uiState.value = LocationDetailsUiState(
+            isLoading = false,
+            hasError = true
+        )
+    }
+
+    fun retry() {
         loadJob?.cancel()
         _uiState.value = LocationDetailsUiState()
 

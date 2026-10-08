@@ -1,9 +1,12 @@
 package com.wilfredorellana.laboratorio8.ui.screens.characterdetails
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.wilfredorellana.laboratorio8.data.Character
 import com.wilfredorellana.laboratorio8.data.CharacterDb
+import com.wilfredorellana.laboratorio8.navigation.CharacterDetailsRoute
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -18,17 +21,30 @@ data class CharacterDetailsUiState(
     val hasError: Boolean = false
 )
 
-class CharacterDetailsViewModel : ViewModel() {
+class CharacterDetailsViewModel(
+    savedStateHandle: SavedStateHandle
+) : ViewModel() {
+    private val characterId =
+        savedStateHandle.toRoute<CharacterDetailsRoute>().characterId
+
     private val _uiState = MutableStateFlow(CharacterDetailsUiState())
     val uiState: StateFlow<CharacterDetailsUiState> = _uiState.asStateFlow()
 
-    private var requestedId: Int? = null
     private var loadJob: Job? = null
 
-    fun load(characterId: Int) {
-        if (requestedId == characterId) return
+    init {
+        retry()
+    }
 
-        requestedId = characterId
+    fun showError() {
+        loadJob?.cancel()
+        _uiState.value = CharacterDetailsUiState(
+            isLoading = false,
+            hasError = true
+        )
+    }
+
+    fun retry() {
         loadJob?.cancel()
         _uiState.value = CharacterDetailsUiState()
 

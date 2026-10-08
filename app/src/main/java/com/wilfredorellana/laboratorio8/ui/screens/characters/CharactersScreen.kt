@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.wilfredorellana.laboratorio8.ui.screens.ErrorScreen
 import com.wilfredorellana.laboratorio8.ui.screens.LoadingScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -32,22 +33,22 @@ fun CharactersScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Characters") }
-            )
+            TopAppBar(title = { Text("Characters") })
         }
     ) { innerPadding ->
         when {
             state.isLoading -> {
-                LoadingScreen(Modifier.padding(innerPadding))
+                LoadingScreen(
+                    onClick = viewModel::showError,
+                    modifier = Modifier.padding(innerPadding)
+                )
             }
 
             state.hasError -> {
-                Text(
-                    text = "No se pudieron cargar los personajes",
-                    modifier = Modifier
-                        .padding(innerPadding)
-                        .padding(24.dp)
+                ErrorScreen(
+                    message = "Error al obtener listado de personajes.",
+                    onRetry = viewModel::retry,
+                    modifier = Modifier.padding(innerPadding)
                 )
             }
 
@@ -77,7 +78,6 @@ fun CharactersScreen(
                                     text = character.name,
                                     style = MaterialTheme.typography.titleMedium
                                 )
-
                                 Text(
                                     text = "${character.status} - ${character.species}",
                                     style = MaterialTheme.typography.bodyMedium,

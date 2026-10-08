@@ -21,7 +21,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import androidx.navigation.toRoute
 import com.wilfredorellana.laboratorio8.navigation.CharacterDetailsRoute
 import com.wilfredorellana.laboratorio8.navigation.CharactersGraph
 import com.wilfredorellana.laboratorio8.navigation.CharactersListRoute
@@ -144,12 +143,8 @@ fun MainScreen(
                     )
                 }
 
-                composable<CharacterDetailsRoute> { backStackEntry ->
-                    val route =
-                        backStackEntry.toRoute<CharacterDetailsRoute>()
-
+                composable<CharacterDetailsRoute> {
                     CharacterDetailsScreen(
-                        characterId = route.characterId,
                         onBack = {
                             navController.popBackStack()
                         }
@@ -170,12 +165,8 @@ fun MainScreen(
                     )
                 }
 
-                composable<LocationDetailsRoute> { backStackEntry ->
-                    val route =
-                        backStackEntry.toRoute<LocationDetailsRoute>()
-
+                composable<LocationDetailsRoute> {
                     LocationDetailsScreen(
-                        locationId = route.locationId,
                         onBack = {
                             navController.popBackStack()
                         }

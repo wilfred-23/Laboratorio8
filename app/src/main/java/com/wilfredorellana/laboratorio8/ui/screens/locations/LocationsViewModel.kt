@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.wilfredorellana.laboratorio8.data.Location
 import com.wilfredorellana.laboratorio8.data.LocationDb
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,8 +22,25 @@ class LocationsViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(LocationsUiState())
     val uiState: StateFlow<LocationsUiState> = _uiState.asStateFlow()
 
+    private var loadJob: Job? = null
+
     init {
-        viewModelScope.launch {
+        retry()
+    }
+
+    fun showError() {
+        loadJob?.cancel()
+        _uiState.value = LocationsUiState(
+            isLoading = false,
+            hasError = true
+        )
+    }
+
+    fun retry() {
+        loadJob?.cancel()
+        _uiState.value = LocationsUiState()
+
+        loadJob = viewModelScope.launch {
             try {
                 delay(4_000)
                 _uiState.value = LocationsUiState(

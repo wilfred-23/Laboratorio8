@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.wilfredorellana.laboratorio8.ui.screens.ErrorScreen
 import com.wilfredorellana.laboratorio8.ui.screens.LoadingScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -32,22 +33,22 @@ fun LocationsScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Locations") }
-            )
+            TopAppBar(title = { Text("Locations") })
         }
     ) { innerPadding ->
         when {
             state.isLoading -> {
-                LoadingScreen(Modifier.padding(innerPadding))
+                LoadingScreen(
+                    onClick = viewModel::showError,
+                    modifier = Modifier.padding(innerPadding)
+                )
             }
 
             state.hasError -> {
-                Text(
-                    text = "No se pudieron cargar las ubicaciones",
-                    modifier = Modifier
-                        .padding(innerPadding)
-                        .padding(24.dp)
+                ErrorScreen(
+                    message = "Error al obtener listado de ubicaciones.",
+                    onRetry = viewModel::retry,
+                    modifier = Modifier.padding(innerPadding)
                 )
             }
 
@@ -77,7 +78,6 @@ fun LocationsScreen(
                                     text = location.name,
                                     style = MaterialTheme.typography.titleMedium
                                 )
-
                                 Text(
                                     text = location.type,
                                     style = MaterialTheme.typography.bodyMedium,
