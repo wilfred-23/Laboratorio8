@@ -17,16 +17,27 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.wilfredorellana.laboratorio8.data.Location
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.wilfredorellana.laboratorio8.ui.screens.LoadingScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LocationDetailsScreen(
-    location: Location?,
-    onBack: () -> Unit
+    locationId: Int,
+    onBack: () -> Unit,
+    viewModel: LocationDetailsViewModel = viewModel()
 ) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(locationId) {
+        viewModel.load(locationId)
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -42,32 +53,42 @@ fun LocationDetailsScreen(
             )
         }
     ) { innerPadding ->
-        if (location == null) {
-            Text(
-                text = "No se encontró la ubicación",
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .padding(24.dp)
-            )
-        } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
+        val location = state.data
+
+        when {
+            state.isLoading -> {
+                LoadingScreen(Modifier.padding(innerPadding))
+            }
+
+            state.hasError || location == null -> {
                 Text(
-                    text = location.name,
-                    style = MaterialTheme.typography.headlineSmall
+                    text = "No se encontró la ubicación",
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .padding(24.dp)
                 )
+            }
 
-                HorizontalDivider()
+            else -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .padding(24.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        text = location.name,
+                        style = MaterialTheme.typography.headlineSmall
+                    )
 
-                DetailRow("ID", location.id.toString())
-                DetailRow("Nombre", location.name)
-                DetailRow("Tipo", location.type)
-                DetailRow("Dimensión", location.dimension)
+                    HorizontalDivider()
+
+                    DetailRow("ID", location.id.toString())
+                    DetailRow("Nombre", location.name)
+                    DetailRow("Tipo", location.type)
+                    DetailRow("Dimensión", location.dimension)
+                }
             }
         }
     }

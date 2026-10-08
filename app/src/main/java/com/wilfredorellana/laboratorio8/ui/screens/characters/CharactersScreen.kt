@@ -15,16 +15,21 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.wilfredorellana.laboratorio8.data.Character
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.wilfredorellana.laboratorio8.ui.screens.LoadingScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CharactersScreen(
-    characters: List<Character>,
-    onCharacterClick: (Int) -> Unit
+    onCharacterClick: (Int) -> Unit,
+    viewModel: CharactersViewModel = viewModel()
 ) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -32,37 +37,54 @@ fun CharactersScreen(
             )
         }
     ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(
-                items = characters,
-                key = { character -> character.id }
-            ) { character ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            onCharacterClick(character.id)
-                        }
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Text(
-                            text = character.name,
-                            style = MaterialTheme.typography.titleMedium
-                        )
+        when {
+            state.isLoading -> {
+                LoadingScreen(Modifier.padding(innerPadding))
+            }
 
-                        Text(
-                            text = "${character.status} - ${character.species}",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+            state.hasError -> {
+                Text(
+                    text = "No se pudieron cargar los personajes",
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .padding(24.dp)
+                )
+            }
+
+            else -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(
+                        items = state.data,
+                        key = { character -> character.id }
+                    ) { character ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    onCharacterClick(character.id)
+                                }
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(16.dp)
+                            ) {
+                                Text(
+                                    text = character.name,
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+
+                                Text(
+                                    text = "${character.status} - ${character.species}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
                     }
                 }
             }

@@ -22,8 +22,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
-import com.wilfredorellana.laboratorio8.data.CharacterDb
-import com.wilfredorellana.laboratorio8.data.LocationDb
 import com.wilfredorellana.laboratorio8.navigation.CharacterDetailsRoute
 import com.wilfredorellana.laboratorio8.navigation.CharactersGraph
 import com.wilfredorellana.laboratorio8.navigation.CharactersListRoute
@@ -138,7 +136,6 @@ fun MainScreen(
             ) {
                 composable<CharactersListRoute> {
                     CharactersScreen(
-                        characters = CharacterDb.getCharacters(),
                         onCharacterClick = { characterId ->
                             navController.navigate(
                                 CharacterDetailsRoute(characterId)
@@ -152,9 +149,7 @@ fun MainScreen(
                         backStackEntry.toRoute<CharacterDetailsRoute>()
 
                     CharacterDetailsScreen(
-                        character = CharacterDb.getCharacterById(
-                            route.characterId
-                        ),
+                        characterId = route.characterId,
                         onBack = {
                             navController.popBackStack()
                         }
@@ -167,7 +162,6 @@ fun MainScreen(
             ) {
                 composable<LocationsListRoute> {
                     LocationsScreen(
-                        locations = LocationDb.getLocations(),
                         onLocationClick = { locationId ->
                             navController.navigate(
                                 LocationDetailsRoute(locationId)
@@ -181,9 +175,7 @@ fun MainScreen(
                         backStackEntry.toRoute<LocationDetailsRoute>()
 
                     LocationDetailsScreen(
-                        location = LocationDb.getLocationById(
-                            route.locationId
-                        ),
+                        locationId = route.locationId,
                         onBack = {
                             navController.popBackStack()
                         }

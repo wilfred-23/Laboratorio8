@@ -17,16 +17,27 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.wilfredorellana.laboratorio8.data.Character
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.wilfredorellana.laboratorio8.ui.screens.LoadingScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CharacterDetailsScreen(
-    character: Character?,
-    onBack: () -> Unit
+    characterId: Int,
+    onBack: () -> Unit,
+    viewModel: CharacterDetailsViewModel = viewModel()
 ) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(characterId) {
+        viewModel.load(characterId)
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -42,33 +53,43 @@ fun CharacterDetailsScreen(
             )
         }
     ) { innerPadding ->
-        if (character == null) {
-            Text(
-                text = "No se encontró el personaje",
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .padding(24.dp)
-            )
-        } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
+        val character = state.data
+
+        when {
+            state.isLoading -> {
+                LoadingScreen(Modifier.padding(innerPadding))
+            }
+
+            state.hasError || character == null -> {
                 Text(
-                    text = character.name,
-                    style = MaterialTheme.typography.headlineSmall
+                    text = "No se encontró el personaje",
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .padding(24.dp)
                 )
+            }
 
-                HorizontalDivider()
+            else -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .padding(24.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        text = character.name,
+                        style = MaterialTheme.typography.headlineSmall
+                    )
 
-                DetailRow("ID", character.id.toString())
-                DetailRow("Estado", character.status)
-                DetailRow("Especie", character.species)
-                DetailRow("Género", character.gender)
-                DetailRow("Origen", character.origin)
+                    HorizontalDivider()
+
+                    DetailRow("ID", character.id.toString())
+                    DetailRow("Estado", character.status)
+                    DetailRow("Especie", character.species)
+                    DetailRow("Género", character.gender)
+                    DetailRow("Origen", character.origin)
+                }
             }
         }
     }
